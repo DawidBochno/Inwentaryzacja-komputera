@@ -210,7 +210,9 @@ def analizuj(f, teraz):
 
     siec = [[n.get("karta"), n.get("mac"), ", ".join(lista(n.get("ip"))), ", ".join(lista(n.get("brama"))),
              ", ".join(lista(n.get("dns"))), "tak" if n.get("dhcp") else "nie"] for n in lista(f.get("siec"))]
-    ipv4 = [ip for n in lista(f.get("siec")) for ip in lista(n.get("ip")) if ":" not in ip]
+    # podsumowanie: karty z brama (bez wirtualnych VirtualBox/Hyper-V); pelna lista w arkuszu Siec
+    glowne = [n for n in lista(f.get("siec")) if lista(n.get("brama"))] or lista(f.get("siec"))
+    ipv4 = [ip for n in glowne for ip in lista(n.get("ip")) if ":" not in ip]
     drukarki = [[d.get("nazwa"), d.get("sterownik"), d.get("port"), "tak" if d.get("domyslna") else "",
                  "tak" if d.get("sieciowa") else ""] for d in lista(f.get("drukarki"))]
     monitory = [[m.get("producent"), m.get("model"), m.get("numer"), m.get("rok")] for m in lista(f.get("monitory"))]
@@ -244,7 +246,7 @@ def analizuj(f, teraz):
         ("Ostatnia aktualizacja", dzien(f.get("aktualizacja")) or "brak danych"),
         ("Ostatnie uruchomienie", up.strftime("%Y-%m-%d %H:%M") if up else ""),
         ("Adres IP", ", ".join(ipv4)),
-        ("Adres MAC", ", ".join(n[1] for n in siec if n[1])),
+        ("Adres MAC", ", ".join(n["mac"] for n in glowne if n.get("mac"))),
         ("Drukarki", len(drukarki)),
         ("Programy", len(programy)),
         ("Uwagi", "; ".join(uwagi)),
@@ -490,6 +492,9 @@ def selftest():
                                   ["Adobe Acrobat Reader", "24.1", "Adobe", "2024-01-15"]]
     assert ark["Dyski"][2][0][5:] == ["dobry", 38, 4, 9120] and ark["Woluminy"][2][0][5] == "39%"
     assert ark["Sieć"][2][0][2:] == ["192.168.1.15, fe80::1", "192.168.1.1", "", "tak"]
+    wirt = {"karta": "VirtualBox Host-Only", "mac": "0A:00:27:00:00:0F", "ip": ["169.254.1.2"], "brama": [None]}
+    k = dict(analizuj(dict(pc, siec=[wirt, pc["siec"]]), teraz)[0][0][2])
+    assert k["Adres IP"] == "192.168.1.15" and k["Adres MAC"] == "AA:BB:CC:00:11:22", k
 
     zly = dict(pc, komputer="UG-PC-002", aktualizacja=None, obudowa=10, pamiec=None, gniazda=None,
                aktywacja=[{"opis": "Windows(R) Operating System, RETAIL channel", "stan": 5, "klucz": "AAAAA"}],
