@@ -21,7 +21,8 @@ Działa **bez uprawnień administratora**.
 ## Szybki start
 
 1. Zainstaluj [Pythona](https://www.python.org/downloads/windows/) (zaznacz **„Add python.exe to PATH”**).
-2. Pobierz repozytorium (**Code → Download ZIP**) i rozpakuj, np. do `C:\Programy\`.
+2. Pobierz `Inwentaryzacja-komputera-<wersja>.zip` z [najnowszego wydania](https://github.com/DawidBochno/Inwentaryzacja-komputera/releases/latest)
+   (albo **Code → Download ZIP**) i rozpakuj, np. do `C:\Programy\`.
 3. Uruchom **`install.bat`** (raz). Na końcu musi pojawić się „selftest OK”.
 4. Uruchom **`uruchom.bat`** i kliknij **Inwentaryzuj**.
 
@@ -79,8 +80,8 @@ które uruchomiło program.
 1. **Python**: pobierz z [python.org](https://www.python.org/downloads/windows/)
    (wersja 3.9 lub nowsza). W instalatorze zaznacz **„Add python.exe to PATH”**.
    Opcja „tcl/tk and IDLE” jest zaznaczona domyślnie i musi taka zostać.
-2. **Program**: pobierz ZIP z GitHuba i rozpakuj. Nie uruchamiaj programu
-   z wnętrza ZIP-a.
+2. **Program**: z [najnowszego wydania](https://github.com/DawidBochno/Inwentaryzacja-komputera/releases/latest)
+   pobierz ZIP i rozpakuj. Nie uruchamiaj programu z wnętrza ZIP-a.
 3. Kliknij dwukrotnie **`install.bat`**. Instaluje bibliotekę `openpyxl`
    (potrzebny internet) i uruchamia test, który odczytuje też dane tego
    komputera. Na końcu pojawia się **„selftest OK”**.
