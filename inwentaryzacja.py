@@ -40,6 +40,9 @@ STAN_DYSKU = {"Healthy": "dobry", "Warning": "ostrzeżenie", "Unhealthy": "zły"
 SKRYPT_PS = r"""
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
+# zapytanie WMI potrafi zawisnac (np. SoftwareLicensingProduct na swiezej maszynie) -
+# po limicie Proba/Cim zwraca null zamiast blokowac cala inwentaryzacje
+$PSDefaultParameterValues['Get-CimInstance:OperationTimeoutSec'] = 30
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 function Proba($b) { try { & $b } catch { $null } }
 function Czas($d) { if ($d) { ([datetime]$d).ToString('s') } else { $null } }
@@ -115,10 +118,14 @@ $f | ConvertTo-Json -Depth 6 -Compress
 def zbierz():
     """Uruchamia SKRYPT_PS i zwraca fakty (slownik)."""
     kod = base64.b64encode(SKRYPT_PS.encode("utf-16-le")).decode()
-    r = subprocess.run(
-        ["powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
-         "-EncodedCommand", kod],
-        capture_output=True, timeout=300, creationflags=0x08000000)  # CREATE_NO_WINDOW
+    try:
+        r = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+             "-EncodedCommand", kod],
+            capture_output=True, timeout=300, creationflags=0x08000000)  # CREATE_NO_WINDOW
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("PowerShell nie odpowiada od 5 minut (zawieszona usluga Windows: WMI albo "
+                           "Windows Update). Uruchom komputer ponownie i sprobuj jeszcze raz.") from None
     wyjscie = r.stdout.decode("utf-8", "replace").lstrip("﻿").strip()
     if not wyjscie.startswith("{"):
         raise RuntimeError("PowerShell nie zwrocil danych: %s" % (
