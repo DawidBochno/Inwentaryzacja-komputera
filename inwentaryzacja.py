@@ -329,11 +329,11 @@ def zapisz_zestawienie(arkusze, sciezka):
     wb.save(sciezka)
 
 
-def run(out_dir, log, zrodlo=None):
+def run(out_dir, log, zrodlo=None, teraz=None):
     """Inwentaryzacja, karta XLSX, wiersz w zestawieniu. Zwraca (arkusze, uwagi, plik_karty)."""
     log("Odczyt danych komputera (do ok. 30 s) ...")
     f = (zrodlo or zbierz)()
-    teraz = datetime.datetime.now()
+    teraz = teraz or datetime.datetime.now()  # selftest podaje stala date (dane testowe sa wzgledem niej)
     arkusze, uwagi = analizuj(f, teraz)
     log("%s: %d programow, %d dyskow, %d drukarek, uwag: %d" % (
         f.get("komputer"), len(arkusze[1][2]), len(arkusze[2][2]), len(arkusze[5][2]), len(uwagi)))
@@ -527,13 +527,13 @@ def selftest():
     # zapis: karta + zestawienie (zastapienie wierszy, kolumny po naglowkach)
     tmp = tempfile.mkdtemp()
     lines = []
-    _, _, plik = run(tmp, lines.append, zrodlo=lambda: pc)
+    _, _, plik = run(tmp, lines.append, teraz=teraz, zrodlo=lambda: pc)
     assert all(ord(ch) < 128 for line in lines for ch in line), lines
     wb = openpyxl.load_workbook(plik)
     assert wb.sheetnames == ["Komputer", "Programy", "Dyski", "Woluminy", "Sieć", "Drukarki", "Monitory"]
     assert wb["Komputer"]["B9"].value == "ABC1234" and wb["Programy"].max_row == 3
-    run(tmp, lines.append, zrodlo=lambda: zly)
-    run(tmp, lines.append, zrodlo=lambda: dict(pc, numer="NOWY1"))  # ponownie PC-001
+    run(tmp, lines.append, teraz=teraz, zrodlo=lambda: zly)
+    run(tmp, lines.append, teraz=teraz, zrodlo=lambda: dict(pc, numer="NOWY1"))  # ponownie PC-001
     zest = os.path.join(tmp, "zestawienie.xlsx")
     wb = openpyxl.load_workbook(zest)
     assert wb.sheetnames == ["Komputery", "Programy"], wb.sheetnames
@@ -548,7 +548,7 @@ def selftest():
     # starsze zestawienie bez kolumny (np. po dodaniu pola w nowej wersji) - wiersze po naglowkach
     ws.delete_cols(nag.index("Monitory") + 1)
     wb.save(zest)
-    run(tmp, lines.append, zrodlo=lambda: dict(zly, komputer="UG-PC-003"))
+    run(tmp, lines.append, teraz=teraz, zrodlo=lambda: dict(zly, komputer="UG-PC-003"))
     ws = openpyxl.load_workbook(zest)["Komputery"]
     assert [c.value for c in ws[1]] == nag and ws.cell(2, nag.index("Numer seryjny") + 1).value == "NOWY1"
     assert ws.cell(2, nag.index("Monitory") + 1).value is None and ws.max_row == 4
