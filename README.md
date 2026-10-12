@@ -78,7 +78,7 @@ które uruchomiło program.
 ## Instalacja (jednorazowo)
 
 1. **Python**: pobierz z [python.org](https://www.python.org/downloads/windows/)
-   (wersja 3.9 lub nowsza). W instalatorze zaznacz **„Add python.exe to PATH”**.
+   (wersja 3.11 lub nowsza, najlepiej najnowsza). W instalatorze zaznacz **„Add python.exe to PATH”**.
    Opcja „tcl/tk and IDLE” jest zaznaczona domyślnie i musi taka zostać.
 2. **Program**: z [najnowszego wydania](https://github.com/DawidBochno/Inwentaryzacja-komputera/releases/latest)
    pobierz ZIP i rozpakuj. Nie uruchamiaj programu z wnętrza ZIP-a.
@@ -88,7 +88,7 @@ które uruchomiło program.
 4. Program uruchamia się plikiem **`uruchom.bat`**.
 
 Wymagania: Windows 10/11 lub Windows Server 2016+ (PowerShell 5.1 jest
-w systemie), Python 3.9+.
+w systemie), Python 3.11+.
 
 ## Czy program zostanie zablokowany przez antywirusa?
 
